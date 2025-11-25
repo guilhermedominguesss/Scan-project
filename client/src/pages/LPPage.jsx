@@ -122,9 +122,9 @@ export default function LPPage() {
         <div className="max-w-6xl mx-auto space-y-16">
           <div className="text-center space-y-4">
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-dark">
-              Resultados de quem aplicou o método
+              Resultados de nossos clientes
             </h2>
-            <p className="text-muted">Pessoas reais, negócios reais, crescimento real.</p>
+            <p className="text-muted">Veja como empresas como a sua crescem com estratégia direcionada.</p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
@@ -134,19 +134,16 @@ export default function LPPage() {
               className="bg-white p-8 rounded-card shadow-elegant border border-[#F1ECE5] flex flex-col justify-between"
             >
               <div className="mb-6">
-                <Quote className="w-8 h-8 text-primary/20 mb-4" />
+                <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => <div key={i} className="w-4 h-4 bg-primary rounded-full" />)}
+                </div>
                 <p className="text-dark font-serif italic text-lg leading-relaxed">
-                  "Consegui triplicar minha agenda em 60 dias. O diagnóstico abriu meus olhos para o que eu estava fazendo de errado no comercial."
+                  "Triplicamos a agenda em 60 dias. O scan mostrou que nosso gargalo não era captação, era fechamento. Mudamos o processo de vendas e explodiu."
                 </p>
               </div>
-              <div className="border-t border-[#F1ECE5] pt-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                  CM
-                </div>
-                <div>
-                  <p className="font-bold text-dark text-sm">Carla Mendes</p>
-                  <p className="text-xs text-muted uppercase tracking-wider">Estética</p>
-                </div>
+              <div className="border-t border-[#F1ECE5] pt-4">
+                <p className="font-bold text-dark text-sm">Clínica Lumina</p>
+                <p className="text-xs text-muted uppercase tracking-wider font-medium">Estética & Bem-estar</p>
               </div>
             </motion.div>
 
@@ -156,19 +153,16 @@ export default function LPPage() {
               className="bg-white p-8 rounded-card shadow-elegant border border-[#F1ECE5] flex flex-col justify-between"
             >
               <div className="mb-6">
-                 <Quote className="w-8 h-8 text-primary/20 mb-4" />
+                 <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => <div key={i} className="w-4 h-4 bg-primary rounded-full" />)}
+                </div>
                 <p className="text-dark font-serif italic text-lg leading-relaxed">
-                  "Nossa loja nunca vendeu tanto. Mudamos 3 coisas simples sugeridas na análise e o faturamento explodiu."
+                  "Vendas cresceram 68% em 45 dias depois de implementar as recomendações. Não foi sorte — foi estratégia. Agora sabemos exatamente o que funciona."
                 </p>
               </div>
-              <div className="border-t border-[#F1ECE5] pt-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                  FB
-                </div>
-                <div>
-                  <p className="font-bold text-dark text-sm">FitStyle Boutique</p>
-                  <p className="text-xs text-muted uppercase tracking-wider">Moda</p>
-                </div>
+              <div className="border-t border-[#F1ECE5] pt-4">
+                <p className="font-bold text-dark text-sm">FitStyle Boutique</p>
+                <p className="text-xs text-muted uppercase tracking-wider font-medium">E-commerce de Moda</p>
               </div>
             </motion.div>
 
@@ -178,19 +172,16 @@ export default function LPPage() {
               className="bg-white p-8 rounded-card shadow-elegant border border-[#F1ECE5] flex flex-col justify-between"
             >
               <div className="mb-6">
-                 <Quote className="w-8 h-8 text-primary/20 mb-4" />
+                 <div className="flex gap-1 mb-4">
+                  {[...Array(5)].map((_, i) => <div key={i} className="w-4 h-4 bg-primary rounded-full" />)}
+                </div>
                 <p className="text-dark font-serif italic text-lg leading-relaxed">
-                  "Eu não sabia onde estava perdendo clientes. Agora sei exatamente e já comecei a corrigir. O resultado é imediato."
+                  "Virei referência na região em apenas 90 dias. A análise mostrou que eu estava desperdiçando 40% dos meus leads. Simples ajuste, resultados enormes."
                 </p>
               </div>
-              <div className="border-t border-[#F1ECE5] pt-4 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
-                  BP
-                </div>
-                <div>
-                  <p className="font-bold text-dark text-sm">Barber Pro Prime</p>
-                  <p className="text-xs text-muted uppercase tracking-wider">Serviços</p>
-                </div>
+              <div className="border-t border-[#F1ECE5] pt-4">
+                <p className="font-bold text-dark text-sm">Barber Pro Prime</p>
+                <p className="text-xs text-muted uppercase tracking-wider font-medium">Serviços Premium</p>
               </div>
             </motion.div>
           </div>
