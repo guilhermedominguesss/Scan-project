@@ -1,0 +1,324 @@
+Nome do projeto: scan-de-crescimento-pro-replit
+
+Objetivo: criar uma SPA React + Tailwind responsiva (mobile-first) com UM QUIZ COMPLETO chamado “Scan de Crescimento Profissional”, incluindo Dashboard interno, LP final, animações premium (framer-motion opcional), barra de progresso, tracking de eventos, persistência local e copy altamente persuasiva. Projeto completo 100% frontend — sem backend.
+
+====================================================================
+INSTRUÇÕES GERAIS (Siga à risca)
+====================================================================
+
+Framework: React (Vite) + TailwindCSS.
+
+Mobile first. Use breakpoint sm, md, lg, xl.
+
+Identidade visual (obrigatória):
+Primary: #9D6135
+Dark: #232326
+Accent: #CDA580
+Light: #F8F7F2
+Adicionar essas cores como tokens no tailwind.config.js.
+
+Tipografia:
+• Títulos: serif elegante
+• Textos: sans moderna
+
+Animações: framer-motion (opcional) OU Tailwind. Suave, premium e moderada.
+
+Acessibilidade: labels, aria, foco visível, alt em imagens.
+
+Salvar progresso: localStorage + mock endpoint /services/api.js que grava em localStorage.leads.
+
+Eventos (analytics): gravar todos eventos com timestamp em localStorage.events.
+
+Assets para prova social / LP final (usar esses caminhos locais):
+/mnt/data/Captura de tela 2025-11-25 103220.png
+/mnt/data/Captura de tela 2025-11-25 103242.png
+/mnt/data/Captura de tela 2025-11-25 103258.png
+/mnt/data/Captura de tela 2025-11-25 103314.png
+
+====================================================================
+ESTRUTURA DE PASTAS (Exata — obrigatória)
+====================================================================
+
+/src
+  /assets
+  /components
+    Header.jsx
+    Footer.jsx
+    QuestionCard.jsx
+    ProgressBar.jsx
+    RadarBar.jsx
+    CTAButton.jsx
+    AdminTable.jsx
+    LeadModal.jsx
+    ErrorBoundary.jsx
+  /contexts
+    QuizContext.jsx
+  /pages
+    ScanGrowthQuiz.jsx
+    RadarPage.jsx
+    LPPage.jsx
+    AdminPage.jsx
+    Home.jsx
+  /services
+    api.js
+  /utils
+    storage.js
+    analytics.js
+    validators.js
+  App.jsx
+  index.jsx
+/tailwind.config.js
+/package.json
+/README.md
+
+====================================================================
+REQUISITOS FUNCIONAIS (detalhados)
+====================================================================
+
+SPA ÚNICA com rotas:
+• / → tela inicial com botão “Iniciar o Scan” e opção de retomar sessão
+• /scan-growth → quiz
+• /radar → radar de crescimento
+• /lp → landing page final
+• /admin → dashboard
+
+IMPORTANTE — CAPTURA ANTECIPADA (NOVO)
+• Ao clicar em “Iniciar o Scan” o usuário deve primeiro preencher **3 campos obrigatórios** antes de iniciar as perguntas:
+  1. Nome completo (input text)  
+  2. Nome da empresa / estúdio (input text)  
+  3. WhatsApp (input com máscara BR (00) 00000-0000)
+• Microcopy abaixo: “Preencha esses dados para salvar sua análise caso pare no meio do processo. Leva < 60s no total.”  
+• O app deve salvar imediatamente esses 3 campos no localStorage assim que preenchidos (evento analytics: lead_captured_draft).  
+• Se o usuário abandonar posteriormente, você já terá os dados para contato.  
+• Se o usuário retornar, perguntar “Deseja continuar do ponto X?” e permitir retomar.
+
+Quiz possui:
+• Barra de progresso (Passo X/Y) com animação dourada (#CDA580 / #9D6135)  
+• Auto-save a cada resposta (localStorage + api.saveDraft com debounce 800ms)  
+• Recuperação de sessão (continue do ponto anterior)  
+• Animações suaves nas transições (framer-motion opcional)  
+• Persistência completa  
+• Tracking de eventos definidos abaixo
+
+Dashboard interno:
+• Rota protegida com senha guilherme2025 (modal de prompt no front)  
+• Tabela completa de leads (ver seção Dashboard mais abaixo)  
+• Gráficos SVG simples (funil, abandono por etapa)  
+• Export CSV  
+• Filtros por data e status  
+• Reenvio manual de análises e abertura de conversa via wa.me link
+
+Antes de sair da página:
+• beforeunload → registrar quiz_abandoned se não finalizou (lastStep salvo)
+
+ErrorBoundary ativo cobrindo toda a aplicação.
+
+====================================================================
+COPY, FLUXO E PERGUNTAS — SCAN DE CRESCIMENTO PROFISSIONAL (ATUALIZADO COM CAPTURA ANTECIPADA)
+====================================================================
+
+**Observação:** copy redigida para alta conversão, tom consultivo e direto. Português Brasil.
+
+Tela 00 — PRIMEIRA CAPTURA (antes de qualquer pergunta)
+Título: “Antes de começar — precisamos de um dado rápido”
+Subtítulo: “Para salvar sua análise caso pare no meio, preencha seu nome, empresa e WhatsApp. Leva < 10s.”
+Inputs:
+• Nome completo (obrigatório)
+• Nome da empresa / estúdio (obrigatório)
+• WhatsApp (máscara BR) (obrigatório)
+Botão primário: “Salvar e iniciar o Scan” (#9D6135)
+Microcopy: “Garantimos privacidade — só usaremos para enviar sua análise.”
+
+Tela 01 — Abertura (input livre)
+Título: “Para começar sua análise, me conte: qual é exatamente o seu negócio?”
+Subtítulo: “Descreva em poucas linhas o que você faz hoje. Leva apenas 60 segundos.”
+Input: textarea multiline
+Placeholder: “Ex.: Atuo com estética facial em São Paulo. Atendo sozinha e quero lotar agenda.”
+Microcopy: “Escreva de forma objetiva — isso nos ajuda a entender seu desafio real.”
+Botão: “Avançar” (#9D6135)
+
+Tela 02 — Desafio Comercial
+Pergunta: “Qual é o principal desafio comercial hoje?”
+Opções:
+• Conseguir novos clientes
+• Manter clientes retornando
+• Aumentar faturamento
+• Se destacar da concorrência
+• Organizar / Profissionalizar
+
+Tela 03 — Estrutura
+Pergunta: “Como está a sua estrutura hoje?”
+Opções:
+• Faço tudo sozinho
+• Tenho 1–2 pessoas
+• Equipe pequena
+• Empresa estruturada
+
+Tela 04 — Faturamento alvo
+Pergunta: “Quanto você quer faturar consistentemente por mês?”
+Opções:
+• R$2k–5k
+• R$5k–10k
+• R$10k–20k
+• Acima de R$20k
+
+Tela 05 — Mercado & Captação
+Pergunta: “Como você atrai hoje a maioria dos seus clientes?”
+Opções:
+• Instagram
+• Indicação
+• Tráfego pago
+• Loja física
+• Quase não atraio
+
+Tela 06 — Prioridade imediata
+Pergunta: “Se pudesse resolver apenas um ponto neste mês, qual seria?”
+Opções:
+• Gerar mais leads
+• Melhorar taxa de fechamento
+• Aumentar ticket
+• Automatizar atendimento
+
+Tela 07 — Confirmação final (lead)
+Re-exibir Nome / Empresa / WhatsApp já preenchidos (permitir editar)
+Checkbox (obrigatório): “Autorizo o envio da minha análise e orientações pelo WhatsApp.”
+Botão final: “Gerar meu Scan de Crescimento” (dourado #CDA580)
+Ao submeter:
+• Gerar leadId (UUID)  
+• Salvar lead completo em localStorage.leads e chamar api.saveLead(lead) (mock)  
+• Disparar analytics.track('quiz_completed', {leadId, summary})  
+• Redirecionar para /radar
+
+====================================================================
+TELA 08 — RADAR DE CRESCIMENTO
+====================================================================
+
+Título: “Sua análise está pronta.”
+
+Exibir 3 índices animados (RadarBar.jsx):
+• Potencial (%) — calculado com base em: ambição de faturamento + estrutura + resposta aberta (score text analysis básico)  
+• Captação (%) — calculado com base em: resposta de captação + prioridade imediata  
+• Eficiência (%) — calculado com base em: desafio comercial + nível de importância
+
+Cada barra:
+• animação de preenchimento com easing suave  
+• porcentagem exibida numericamente + label textual (Alto / Médio / Baixo)  
+• cor: gradiente dourado (#9D6135 → #CDA580)
+
+Copy curta:
+“Com base nas suas respostas, identificamos exatamente onde seu negócio está perdendo oportunidades — e onde está o seu maior potencial de crescimento.”
+
+CTA: “Ver meus pontos de crescimento” (leads para /lp)
+
+Fórmulas dos scores documentadas em comentários no código (scoreCalculator.js) para fácil ajuste.
+
+====================================================================
+LP FINAL (pós-radar)
+====================================================================
+
+Hero:
+Título: “Seu negócio já tem potencial — agora faltam os movimentos certos.”
+Subtítulo: “Veja onde você perde clientes e como corrigir — converse com um especialista.”
+
+3 colunas dinâmicas (valores do radar):
+• Demanda — mostrar label e microcopy
+• Conversão — mostrar label e microcopy
+• Recompra — mostrar label e microcopy
+
+Prova social:
+• Usar os arquivos em /mnt/data/...
+• Adicionar 2 depoimentos curtos (texto), sem imagem de rosto:
+  - “Passei de 8 para 24 atendimentos semanais em 30 dias.”
+  - “Finalmente entendi onde estava perdendo clientes.”
+
+Bloco preto (#232326):
+Texto: “Estamos prontos para te mostrar exatamente onde você perde clientes.”
+Botão dourado (#CDA580):
+Texto: “Falar com a equipe agora”
+Ação: abrir WhatsApp com mensagem (preenchida):
+“Olá! Completei o Scan de Crescimento. Meu nome é {name}. Empresa: {biz}. Quero conversar.”
+Subtexto: “Vagas limitadas para análise gratuita.”
+
+====================================================================
+DASHBOARD /admin (detalhado)
+====================================================================
+
+Proteção: senha guilherme2025 (modal no front)
+
+Painel geral:
+• Total de leads últimos 7 / 30 dias
+• Gráfico funil (Visitou quiz → Iniciou → Completou → Viu LP → Clicou WhatsApp)
+• Abandono por etapa (%)
+• Tabela de leads (paginada):
+  nome | negócio | whatsapp | quizStatus | leadId | scorePotencial | scoreCaptação | scoreEficiência | data | ações
+Ações:
+• marcar como contatado
+• reenviar análise (re-dispatch para api.saveLead)
+• abrir WhatsApp (wa.me)
+• export CSV
+Filtros:
+• por data
+• por score (Potencial / Captação / Eficiência)
+• por status (novo / contatado / convertido)
+
+====================================================================
+TRACKING / ANALYTICS
+====================================================================
+
+Implementar analytics.js:
+• analytics.track(event, payload) grava em localStorage.events e console.log
+• Payload mínimo: {timestamp, event, leadId, questionId?, answer?}
+• Eventos obrigatórios:
+  - quiz_started
+  - lead_captured_draft (quando capturar Nome/Empresa/WhatsApp)
+  - question_answered (questionId, answer)
+  - quiz_abandoned (lastStep)
+  - quiz_completed (leadId)
+  - radar_viewed
+  - lp_viewed
+  - whatsapp_clicked
+• beforeunload → registrar quiz_abandoned se quiz não finalizado
+• leadId gerado UUID no começo (após captura do draft)
+
+====================================================================
+PRECAUÇÕES REPLIT-FRIENDLY
+====================================================================
+
+• Gerar scaffold (arquitetura de pastas e arquivos vazios) primeiro; então povoar componentes por etapas.  
+• Evitar loops em useEffect — comentar dependências.  
+• Debounce em saves (800ms).  
+• ErrorBoundary com fallback.  
+• Não gerar imagens dinamicamente — usar assets listados.  
+• README com instruções (npm install && npm run dev) e checklist de QA.
+
+====================================================================
+OUTPUTS OBRIGATÓRIOS
+====================================================================
+
+• Projeto completo seguindo a estrutura acima  
+• README.md com instruções detalhadas e checklist de QA  
+• services/api.js mock que grava leads em localStorage.leads  
+• Rota /admin funcionando com recursos descritos  
+• localStorage.events gravando todos eventos  
+• Comentários no código explicando fórmulas de score (scoreCalculator.js)  
+• Código limpo, organizado, responsivo e documentado
+
+====================================================================
+EXTRA — GERAR AUTOMATICAMENTE (ENTREGÁVEIS ADICIONAIS)
+====================================================================
+
+Ao final da geração, incluir AUTOMATICAMENTE (arquivos prontos):
+• /README.md (como executar e checklist)  
+• /COPY (pasta com .md contendo todas as mensagens prontas, CTAs, microcopy, mensagens de WhatsApp pré-formatadas)  
+• /STORY (breve documentação com fluxo do usuário e mapa mental em texto)  
+• /EXPORT (script que exporta CSV de leads quando admin clicar)
+
+====================================================================
+COMANDO FINAL
+====================================================================
+
+Gere todo o código agora conforme este prompt.  
+Confirme antes de iniciar: “CONFIRMAR: vou gerar scaffold e arquivos vazios — deseja prosseguir?”  
+Após confirmação, gere scaffold, mostre árvore de arquivos, depois implemente componentes por etapas.  
+Ao terminar, rodar `npm run dev` e mostrar URL local (ou instruções para rodar).  
+Se ocorrer erro, registrar stack e sugestão de correção no final.
