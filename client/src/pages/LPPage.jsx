@@ -5,15 +5,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import CTAButton from '../components/CTAButton';
 import { motion } from 'framer-motion';
-import { Check, Star, TrendingUp, Users, Target, MessageCircle } from 'lucide-react';
-
-// Using attached assets paths
-const ASSETS = {
-  PROOF1: '/attached_assets/Captura de tela 2025-11-25 103220.png', // Estética
-  PROOF2: '/attached_assets/Captura de tela 2025-11-25 103242.png', // Moda
-  PROOF3: '/attached_assets/Captura de tela 2025-11-25 103258.png', // Serviços
-  PROOF4: '/attached_assets/Captura de tela 2025-11-25 103314.png'  // Extra
-};
+import { TrendingUp, Users, Target, MessageCircle, Quote } from 'lucide-react';
 
 export default function LPPage() {
   const { scores, lead } = useQuiz();
@@ -125,7 +117,7 @@ export default function LPPage() {
         </div>
       </section>
 
-      {/* Social Proof Section - UPDATED */}
+      {/* Social Proof Section - TEXT ONLY */}
       <section className="py-24 px-6 bg-[#F8F7F2] overflow-hidden">
         <div className="max-w-6xl mx-auto space-y-16">
           <div className="text-center space-y-4">
@@ -136,70 +128,69 @@ export default function LPPage() {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Card 1: Estética */}
+            {/* Card 1 */}
             <motion.div 
               whileHover={{ y: -5 }}
-              className="bg-white p-6 rounded-card shadow-soft border border-[#F1ECE5]"
+              className="bg-white p-8 rounded-card shadow-elegant border border-[#F1ECE5] flex flex-col justify-between"
             >
-              <div className="aspect-video rounded-xl overflow-hidden mb-6 bg-gray-100 relative">
-                 {/* Using local asset as background/mockup */}
-                 <img src={ASSETS.PROOF1} alt="Caso Estética" className="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-500" />
-              </div>
-              <div className="mb-4">
-                <div className="flex text-primary mb-2">
-                  {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-current" />)}
-                </div>
-                <p className="text-dark font-serif italic text-lg leading-snug">
-                  "Duplicamos o faturamento em 32 dias. Eu não sabia que meu gargalo era apenas o processo de vendas."
+              <div className="mb-6">
+                <Quote className="w-8 h-8 text-primary/20 mb-4" />
+                <p className="text-dark font-serif italic text-lg leading-relaxed">
+                  "Consegui triplicar minha agenda em 60 dias. O diagnóstico abriu meus olhos para o que eu estava fazendo de errado no comercial."
                 </p>
               </div>
-              <div className="border-t border-[#F1ECE5] pt-4">
-                <p className="font-bold text-dark text-sm">Clínica Lumina</p>
-                <p className="text-xs text-muted uppercase tracking-wider">Estética Avançada</p>
+              <div className="border-t border-[#F1ECE5] pt-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                  CM
+                </div>
+                <div>
+                  <p className="font-bold text-dark text-sm">Carla Mendes</p>
+                  <p className="text-xs text-muted uppercase tracking-wider">Estética</p>
+                </div>
               </div>
             </motion.div>
 
-            {/* Card 2: Moda */}
+            {/* Card 2 */}
             <motion.div 
               whileHover={{ y: -5 }}
-              className="bg-white p-6 rounded-card shadow-soft border border-[#F1ECE5]"
+              className="bg-white p-8 rounded-card shadow-elegant border border-[#F1ECE5] flex flex-col justify-between"
             >
-              <div className="aspect-video rounded-xl overflow-hidden mb-6 bg-gray-100 relative">
-                 <img src={ASSETS.PROOF2} alt="Caso Moda" className="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-500" />
-              </div>
-              <div className="mb-4">
-                <div className="flex text-primary mb-2">
-                  {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-current" />)}
-                </div>
-                <p className="text-dark font-serif italic text-lg leading-snug">
-                  "Minhas vendas cresceram 68% em 45 dias. O ajuste no tráfego foi cirúrgico."
+              <div className="mb-6">
+                 <Quote className="w-8 h-8 text-primary/20 mb-4" />
+                <p className="text-dark font-serif italic text-lg leading-relaxed">
+                  "Nossa loja nunca vendeu tanto. Mudamos 3 coisas simples sugeridas na análise e o faturamento explodiu."
                 </p>
               </div>
-              <div className="border-t border-[#F1ECE5] pt-4">
-                <p className="font-bold text-dark text-sm">FitStyle Boutique</p>
-                <p className="text-xs text-muted uppercase tracking-wider">E-commerce de Moda</p>
+              <div className="border-t border-[#F1ECE5] pt-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                  FB
+                </div>
+                <div>
+                  <p className="font-bold text-dark text-sm">FitStyle Boutique</p>
+                  <p className="text-xs text-muted uppercase tracking-wider">Moda</p>
+                </div>
               </div>
             </motion.div>
 
-            {/* Card 3: Serviços */}
+            {/* Card 3 */}
             <motion.div 
               whileHover={{ y: -5 }}
-              className="bg-white p-6 rounded-card shadow-soft border border-[#F1ECE5]"
+              className="bg-white p-8 rounded-card shadow-elegant border border-[#F1ECE5] flex flex-col justify-between"
             >
-              <div className="aspect-video rounded-xl overflow-hidden mb-6 bg-gray-100 relative">
-                 <img src={ASSETS.PROOF3} alt="Caso Serviços" className="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-500" />
-              </div>
-              <div className="mb-4">
-                <div className="flex text-primary mb-2">
-                  {[1,2,3,4,5].map(s => <Star key={s} className="w-4 h-4 fill-current" />)}
-                </div>
-                <p className="text-dark font-serif italic text-lg leading-snug">
-                  "Virei referência na região. A agenda hoje tem fila de espera de 3 semanas."
+              <div className="mb-6">
+                 <Quote className="w-8 h-8 text-primary/20 mb-4" />
+                <p className="text-dark font-serif italic text-lg leading-relaxed">
+                  "Eu não sabia onde estava perdendo clientes. Agora sei exatamente e já comecei a corrigir. O resultado é imediato."
                 </p>
               </div>
-              <div className="border-t border-[#F1ECE5] pt-4">
-                <p className="font-bold text-dark text-sm">Barber Pro Prime</p>
-                <p className="text-xs text-muted uppercase tracking-wider">Serviços Premium</p>
+              <div className="border-t border-[#F1ECE5] pt-4 flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
+                  BP
+                </div>
+                <div>
+                  <p className="font-bold text-dark text-sm">Barber Pro Prime</p>
+                  <p className="text-xs text-muted uppercase tracking-wider">Serviços</p>
+                </div>
               </div>
             </motion.div>
           </div>

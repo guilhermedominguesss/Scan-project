@@ -12,13 +12,13 @@ import CTAButton from '../components/CTAButton';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LockKeyhole, CheckCircle2 } from 'lucide-react';
+import { LockKeyhole, CheckCircle2, AlertCircle } from 'lucide-react';
 
 const QUESTIONS = [
   {
     id: 'business_desc',
     type: 'text',
-    question: 'Para começar, me conte: qual é exatamente o seu negócio?',
+    question: 'Para começar sua análise, me conte: qual é exatamente o seu negócio?',
     placeholder: 'Ex.: Atuo com estética facial em São Paulo. Atendo sozinha e quero lotar agenda.',
     microcopy: 'Escreva de forma objetiva — isso nos ajuda a entender seu desafio real.',
     buttonText: 'Avançar'
@@ -100,9 +100,8 @@ export default function ScanGrowthQuiz() {
     company: '',
     whatsapp: ''
   });
-  const [isCapturing, setIsCapturing] = useState(true);
+  const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showConfirm, setShowConfirm] = useState(false);
 
   // Initialize state based on existing lead
   useEffect(() => {
@@ -112,34 +111,51 @@ export default function ScanGrowthQuiz() {
         company: lead.company,
         whatsapp: lead.whatsapp
       });
-      setIsCapturing(false);
     }
   }, [lead]);
 
   // Before Unload Tracking
   useEffect(() => {
     const handleUnload = () => {
-      if (lead && !showConfirm) { // If confirm shown, it's almost done
-         trackEvent(EVENTS.QUIZ_ABANDONED, { lastStep: step, leadId: lead.id });
+      // Track abandonment if quiz started (step > 0) but not finished
+      if (step > 0 && step <= QUESTIONS.length) {
+         trackEvent(EVENTS.QUIZ_ABANDONED, { lastStep: step, leadId: lead?.id });
       }
     };
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
-  }, [lead, step, showConfirm]);
+  }, [lead, step]);
 
 
-  // CAPTURE STEP HANDLER
+  // STEP 0: CAPTURE HANDLER
   const handleCaptureSubmit = async (e) => {
     e.preventDefault();
-    if (!captureForm.name || !captureForm.company || !captureForm.whatsapp) return;
+    setError('');
+
+    if (!captureForm.name || !captureForm.company || !captureForm.whatsapp) {
+      setError('Por favor, preencha todos os campos obrigatórios.');
+      return;
+    }
+
+    // Simple validation length check
+    if (captureForm.whatsapp.replace(/\D/g, '').length < 10) {
+      setError('Por favor, insira um WhatsApp válido.');
+      return;
+    }
     
     setIsSubmitting(true);
     try {
-      await captureLead(captureForm);
-      setIsCapturing(false);
-      trackEvent(EVENTS.QUIZ_STARTED, { leadId: lead?.id }); // Will use new ID from context update
+      await captureLead({
+        ...captureForm,
+        startedAt: new Date().toISOString()
+      });
+      
+      trackEvent(EVENTS.LEAD_CAPTURED_DRAFT, { leadId: lead?.id });
+      // Move to Question 1
+      nextStep(); 
     } catch (err) {
       console.error(err);
+      setError('Erro ao salvar. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -147,50 +163,58 @@ export default function ScanGrowthQuiz() {
 
   const handlePhoneChange = (e) => {
     setCaptureForm(prev => ({ ...prev, whatsapp: formatPhoneBR(e.target.value) }));
+    if (error) setError('');
   };
 
-  // QUIZ HANDLER
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setCaptureForm(prev => ({ ...prev, [id]: value }));
+    if (error) setError('');
+  };
+
+  // STEP 1-6: QUIZ HANDLER
   const handleAnswer = async (value) => {
-    const currentQ = QUESTIONS[step];
+    // QUESTIONS array is 0-indexed, but Steps are 1-indexed relative to QUESTIONS
+    // So Step 1 = QUESTIONS[0]
+    const questionIndex = step - 1;
+    const currentQ = QUESTIONS[questionIndex];
+    
     await answerQuestion(currentQ.id, value);
     
-    if (step < QUESTIONS.length - 1) {
-      nextStep();
-    } else {
-      setShowConfirm(true);
-    }
+    nextStep();
   };
 
-  // FINAL SUBMIT
+  // STEP 7: FINAL SUBMIT
   const handleFinalSubmit = async () => {
     setIsSubmitting(true);
     try {
-      // Recalculate scores one last time to be safe
       const finalScores = calculateScores(answers);
       setScores(finalScores);
       
-      // Update lead with any edits from confirmation screen
       const completedLead = {
         ...lead,
-        ...captureForm, // In case they edited it
+        ...captureForm, // Ensure latest contact info
         scores: finalScores,
         status: 'completed',
         completedAt: new Date().toISOString()
       };
       
       await api.saveLead(completedLead);
-      trackEvent(EVENTS.QUIZ_COMPLETED, { leadId: lead.id, scores: finalScores });
+      trackEvent(EVENTS.QUIZ_COMPLETED, { leadId: lead?.id, scores: finalScores });
       
       setLocation('/radar');
     } catch (e) {
       console.error(e);
+      setError('Erro ao finalizar. Tente novamente.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  // RENDER: CAPTURE SCREEN
-  if (isCapturing) {
+  // RENDER LOGIC
+  
+  // STEP 0: CAPTURE SCREEN
+  if (step === 0) {
     return (
       <div className="min-h-screen bg-[#F8F7F2] flex flex-col items-center justify-center p-4 relative overflow-hidden">
         <Header className="absolute top-0 left-0" />
@@ -206,7 +230,7 @@ export default function ScanGrowthQuiz() {
             </div>
             <h2 className="text-2xl font-serif font-bold text-dark">Antes de começar</h2>
             <p className="text-sm text-muted">
-              Preencha seus dados para salvar sua análise caso precise parar no meio. Leva &lt; 60s.
+              Para salvar sua análise caso pare no meio, preencha seu nome, empresa e WhatsApp. Leva &lt; 10s.
             </p>
           </div>
 
@@ -216,7 +240,7 @@ export default function ScanGrowthQuiz() {
               <Input 
                 id="name" 
                 value={captureForm.name} 
-                onChange={e => setCaptureForm(prev => ({...prev, name: e.target.value}))} 
+                onChange={handleInputChange} 
                 required
                 className="bg-[#FAFAFA] border-input focus:border-primary h-12"
                 placeholder="Seu nome"
@@ -228,7 +252,7 @@ export default function ScanGrowthQuiz() {
               <Input 
                 id="company" 
                 value={captureForm.company} 
-                onChange={e => setCaptureForm(prev => ({...prev, company: e.target.value}))} 
+                onChange={handleInputChange} 
                 required
                 className="bg-[#FAFAFA] border-input focus:border-primary h-12"
                 placeholder="Ex: Clínica Silva"
@@ -247,17 +271,24 @@ export default function ScanGrowthQuiz() {
               />
             </div>
 
+            {error && (
+              <div className="flex items-center gap-2 text-[#C95050] text-sm bg-red-50 p-3 rounded-lg">
+                <AlertCircle className="w-4 h-4" />
+                {error}
+              </div>
+            )}
+
             <CTAButton 
               type="submit" 
               loading={isSubmitting}
               className="w-full mt-4"
             >
-              Salvar e Iniciar
+              Salvar e iniciar o Scan
             </CTAButton>
             
             <div className="flex items-center justify-center gap-2 text-[10px] text-muted/60 mt-4">
               <LockKeyhole className="w-3 h-3" />
-              <span>Garantimos privacidade total dos seus dados.</span>
+              <span>Garantimos privacidade — só usaremos para enviar sua análise.</span>
             </div>
           </form>
         </motion.div>
@@ -265,8 +296,8 @@ export default function ScanGrowthQuiz() {
     );
   }
 
-  // RENDER: CONFIRMATION SCREEN
-  if (showConfirm) {
+  // STEP 7: CONFIRMATION SCREEN (After last question)
+  if (step > QUESTIONS.length) {
     return (
       <div className="min-h-screen bg-[#F8F7F2] flex flex-col items-center justify-center p-4">
         <Header className="absolute top-0 left-0" />
@@ -287,22 +318,25 @@ export default function ScanGrowthQuiz() {
              <div className="space-y-1.5">
               <Label className="text-xs uppercase tracking-wider text-muted font-bold">Nome</Label>
               <Input 
+                id="name"
                 value={captureForm.name} 
-                onChange={e => setCaptureForm(prev => ({...prev, name: e.target.value}))} 
+                onChange={handleInputChange}
                 className="bg-[#FAFAFA] h-11"
               />
             </div>
              <div className="space-y-1.5">
               <Label className="text-xs uppercase tracking-wider text-muted font-bold">Empresa</Label>
               <Input 
+                id="company"
                 value={captureForm.company} 
-                onChange={e => setCaptureForm(prev => ({...prev, company: e.target.value}))} 
+                onChange={handleInputChange}
                 className="bg-[#FAFAFA] h-11"
               />
             </div>
              <div className="space-y-1.5">
               <Label className="text-xs uppercase tracking-wider text-muted font-bold">WhatsApp</Label>
               <Input 
+                id="whatsapp"
                 value={captureForm.whatsapp} 
                 onChange={handlePhoneChange} 
                 className="bg-[#FAFAFA] h-11"
@@ -326,7 +360,7 @@ export default function ScanGrowthQuiz() {
           </CTAButton>
           
           <button 
-            onClick={() => setShowConfirm(false)}
+            onClick={() => setStep(QUESTIONS.length)} // Go back to last question
             className="w-full text-center text-xs text-muted mt-4 hover:text-dark uppercase tracking-wider"
           >
             Voltar e revisar
@@ -336,17 +370,19 @@ export default function ScanGrowthQuiz() {
     );
   }
 
-  // RENDER: QUIZ QUESTIONS
-  const currentQ = QUESTIONS[step];
+  // STEPS 1-6: QUIZ QUESTIONS
+  // step is 1-indexed here relative to flow, so index is step - 1
+  const questionIndex = step - 1;
+  const currentQ = QUESTIONS[questionIndex];
 
   return (
     <div className="min-h-screen bg-[#F8F7F2] flex flex-col">
       <Header />
       
       <main className="flex-1 flex flex-col items-center justify-center p-4 pb-20 relative">
-        {/* Progress Bar */}
+        {/* Progress Bar - Shows step 1/6, 2/6 etc. */}
         <div className="w-full fixed top-[80px] left-0 z-40 bg-[#F8F7F2]/90 backdrop-blur-sm py-4">
-           <ProgressBar current={step + 1} total={QUESTIONS.length} />
+           <ProgressBar current={step} total={QUESTIONS.length} />
         </div>
         
         <div className="mt-20 w-full">

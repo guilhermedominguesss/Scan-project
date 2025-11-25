@@ -1,0 +1,159 @@
+ATUALIZAÇÃO CRÍTICA NO PROJETO — CORRIGIR FLUXO DO QUIZZ
+
+NÃO recriar nada. APENAS corrigir o que ficou desconfigurado.
+
+===========================
+1) CORRIGIR ORDEM DAS ETAPAS DO QUIZZ
+===========================
+O fluxo correto deve ser RESTAURADO exatamente nesta ordem:
+
+Tela 00 — PRIMEIRA CAPTURA (antes de qualquer pergunta)
+Título: “Antes de começar — precisamos de um dado rápido”
+Subtítulo: “Para salvar sua análise caso pare no meio, preencha seu nome, empresa e WhatsApp. Leva < 10s.”
+Inputs:
+• Nome completo (obrigatório)
+• Nome da empresa / estúdio (obrigatório)
+• WhatsApp (máscara BR) (obrigatório)
+Botão primário: “Salvar e iniciar o Scan” (#9D6135)
+Microcopy: “Garantimos privacidade — só usaremos para enviar sua análise.”
+
+Tela 01 — Abertura (input livre)
+Título: “Para começar sua análise, me conte: qual é exatamente o seu negócio?”
+Subtítulo: “Descreva em poucas linhas o que você faz hoje. Leva apenas 60 segundos.”
+Input: textarea multiline
+Placeholder: “Ex.: Atuo com estética facial em São Paulo. Atendo sozinha e quero lotar agenda.”
+Microcopy: “Escreva de forma objetiva — isso nos ajuda a entender seu desafio real.”
+Botão: “Avançar” (#9D6135)
+
+Tela 02 — Desafio Comercial
+Pergunta: “Qual é o principal desafio comercial hoje?”
+Opções:
+• Conseguir novos clientes
+• Manter clientes retornando
+• Aumentar faturamento
+• Se destacar da concorrência
+• Organizar / Profissionalizar
+
+Tela 03 — Estrutura
+Pergunta: “Como está a sua estrutura hoje?”
+Opções:
+• Faço tudo sozinho
+• Tenho 1–2 pessoas
+• Equipe pequena
+• Empresa estruturada
+
+Tela 04 — Faturamento alvo
+Pergunta: “Quanto você quer faturar consistentemente por mês?”
+Opções:
+• R$2k–5k
+• R$5k–10k
+• R$10k–20k
+• Acima de R$20k
+
+Tela 05 — Mercado & Captação
+Pergunta: “Como você atrai hoje a maioria dos seus clientes?”
+Opções:
+• Instagram
+• Indicação
+• Tráfego pago
+• Loja física
+• Quase não atraio
+
+Tela 06 — Prioridade imediata
+Pergunta: “Se pudesse resolver apenas um ponto neste mês, qual seria?”
+Opções:
+• Gerar mais leads
+• Melhorar taxa de fechamento
+• Aumentar ticket
+• Automatizar atendimento 
+ Botão: “Gerar minha análise”
+
+(6) Tela Radar:
+ Potencial / Captação / Eficiência (como já estava no design premium)
+
+(7) Landing Final:
+ Blocos: Demanda / Conversão / Recompra
+ CTA: “Falar com a equipe agora”
+
+⚠️ IMPORTANTE:
+- A captura antecipada deve ser *uma tela própria*, antes da pergunta 1.
+- Garantir que a ProgressBar só inicia APÓS essa tela.
+
+===========================
+2) REPARAR O BUG DE STATE / NAVEGAÇÃO ENTRE ETAPAS
+===========================
+• Verificar que cada pergunta incrementa corretamente o stepIndex.  
+• Garantir que o step inicial = 0 (captura antecipada).  
+• stepIndex deve avançar assim:
+   0 → 1 → 2 → 3 → 4 → 5 → radar → lp
+
+• Restaurar localStorage.leadDraft apenas após etapa 0 preenchida.  
+• Não permitir pular etapas.  
+• Garantir que ao atualizar o projeto, os nomes das variáveis de state continuem:
+   currentStep  
+   answers  
+   leadDraft  
+   setCurrentStep  
+   setAnswers  
+
+===========================
+3) AJUSTAR CAMPOS DA CAPTURA ANTECIPADA
+===========================
+Inputs obrigatórios:
+- Nome completo: type="text"
+- Nome da empresa: type="text"
+- WhatsApp BR: aplicar máscara (XX) XXXXX-XXXX
+Validação:
+- Se qualquer campo vazio → não avança.
+- Exibir microcopy de erro discreta (cor #C95050, text-sm).
+
+Salvar no draft:
+leadDraft = {
+  name,
+  company,
+  whatsapp,
+  startedAt: new Date().toISOString()
+}
+
+===========================
+4) PROVAS SOCIAIS — REMOVER TOTALMENTE AS IMAGENS
+===========================
+Excluir qualquer tag <img> ou background-image que estava sendo usada.
+
+Usar APENAS blocos de texto com este formato:
+
+Card 1:
+"Consegui triplicar minha agenda em 60 dias. O diagnóstico abriu meus olhos."
+— Carla Mendes, Estética
+
+Card 2:
+"Nossa loja nunca vendeu tanto. Mudamos 3 coisas simples e o faturamento explodiu."
+— FitStyle Boutique, Moda
+
+Card 3:
+"Eu não sabia onde estava perdendo clientes. Agora sei exatamente."
+— Barber Pro Prime, Serviços
+
+Classes para manter o layout premium:
+bg-white rounded-card shadow-elegant p-inner space-y-3 text-dark
+
+===========================
+5) GARANTIR QUE O LAYOUT ATUAL NÃO SEJA MODIFICADO
+===========================
+- NÃO alterar paleta de cores.
+- NÃO alterar estrutura visual das páginas.
+- Somente ajustar o fluxo, inputs e provas sociais.
+
+===========================
+6) TESTAR ANTES DE FINALIZAR
+===========================
+• Testar no mobile (modo responsivo).  
+• Preencher captura antecipada → avançar → responder tudo → análise final → CTA.  
+• Garantir que não existe mais salto de etapas, blank screens ou step quebrado.  
+• Garantir que progress bar inicia somente APÓS etapa 0.
+
+===========================
+CONFIRMAÇÃO
+===========================
+Ao finalizar a correção, retornar:
+"CORREÇÃO COMPLETA: fluxo restaurado + captura antecipada funcional + provas sociais sem imagens."
