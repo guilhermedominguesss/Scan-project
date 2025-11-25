@@ -13,6 +13,15 @@ import LPPage from "@/pages/LPPage";
 import AdminPage from "@/pages/AdminPage";
 import NotFound from "@/pages/not-found";
 
+// Scroll to top on route change component
+const ScrollToTop = () => {
+  const [location] = React.useState(window.location.pathname);
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location]);
+  return null;
+};
+
 function Router() {
   return (
     <Switch>
@@ -31,6 +40,7 @@ function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <QuizProvider>
+          <ScrollToTop />
           <Router />
           <Toaster />
         </QuizProvider>

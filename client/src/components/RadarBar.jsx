@@ -1,83 +1,78 @@
 import React from 'react';
-import { 
-  Radar, 
-  RadarChart, 
-  PolarGrid, 
-  PolarAngleAxis, 
-  ResponsiveContainer,
-  PolarRadiusAxis
-} from 'recharts';
 import { motion } from 'framer-motion';
 
 export default function RadarBar({ scores }) {
   if (!scores) return null;
 
   const data = [
-    { subject: 'Potencial', A: scores.potencial, fullMark: 100 },
-    { subject: 'Captação', A: scores.captacao, fullMark: 100 },
-    { subject: 'Eficiência', A: scores.eficiencia, fullMark: 100 },
+    { subject: 'Potencial', score: scores.potencial, description: 'Capacidade de escala x Estrutura atual' },
+    { subject: 'Captação', score: scores.captacao, description: 'Força dos canais de aquisição' },
+    { subject: 'Eficiência', score: scores.eficiencia, description: 'Conversão e saúde operacional' },
   ];
 
-  // Helper to determine color/label based on score
-  const getLabel = (score) => {
-    if (score >= 80) return { text: 'Alto', color: 'text-green-600' };
-    if (score >= 50) return { text: 'Médio', color: 'text-yellow-600' };
-    return { text: 'Baixo', color: 'text-red-600' };
+  const getStatus = (score) => {
+    if (score >= 80) return { label: 'Alta', color: 'text-green-600' };
+    if (score >= 50) return { label: 'Média', color: 'text-yellow-600' };
+    return { label: 'Baixa', color: 'text-red-600' };
   };
 
   return (
-    <div className="w-full space-y-12">
-      {/* Chart Section */}
-      <div className="h-[300px] w-full flex justify-center items-center relative">
-        <ResponsiveContainer width="100%" height="100%">
-          <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-            <PolarGrid stroke="#e5e5e5" />
-            <PolarAngleAxis 
-              dataKey="subject" 
-              tick={{ fill: '#232326', fontSize: 14, fontFamily: 'Inter', fontWeight: 600 }} 
-            />
-            <PolarRadiusAxis angle={30} domain={[0, 100]} tick={false} axisLine={false} />
-            <Radar
-              name="Seu Negócio"
-              dataKey="A"
-              stroke="#9D6135"
-              strokeWidth={3}
-              fill="#CDA580"
-              fillOpacity={0.5}
-            />
-          </RadarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Bars Details Section */}
-      <div className="grid gap-6 md:grid-cols-3">
-        {data.map((item) => {
-          const { text, color } = getLabel(item.A);
-          return (
-            <motion.div 
-              key={item.subject}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="bg-card p-6 rounded-xl shadow-sm border border-border/50 text-center"
-            >
-              <h3 className="text-lg font-serif font-bold text-foreground mb-2">{item.subject}</h3>
-              <div className="text-4xl font-bold text-primary mb-1">{Math.round(item.A)}%</div>
-              <div className={`text-sm font-medium uppercase tracking-wider ${color}`}>
-                {text}
-              </div>
-              <div className="w-full bg-muted h-1.5 rounded-full mt-4 overflow-hidden">
-                <motion.div 
-                  className="h-full bg-gradient-to-r from-primary to-accent"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${item.A}%` }}
-                  transition={{ duration: 1.5, ease: "easeOut" }}
+    <div className="w-full grid md:grid-cols-3 gap-6">
+      {data.map((item, index) => {
+        const { label, color } = getStatus(item.score);
+        return (
+          <motion.div 
+            key={item.subject}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 + 0.2 }}
+            className="bg-white rounded-card shadow-soft border border-[#F1ECE5] p-6 flex flex-col items-center text-center h-full"
+          >
+            <h3 className="text-lg font-serif font-bold text-dark mb-1">{item.subject}</h3>
+            <p className="text-xs text-muted mb-6 px-2 h-8">{item.description}</p>
+            
+            <div className="relative w-32 h-32 flex items-center justify-center mb-4">
+              <svg className="w-full h-full transform -rotate-90">
+                <circle
+                  cx="64"
+                  cy="64"
+                  r="60"
+                  stroke="#EAE5DF"
+                  strokeWidth="8"
+                  fill="none"
                 />
+                <motion.circle
+                  cx="64"
+                  cy="64"
+                  r="60"
+                  stroke="url(#gradient)"
+                  strokeWidth="8"
+                  fill="none"
+                  strokeDasharray={2 * Math.PI * 60}
+                  strokeDashoffset={2 * Math.PI * 60 * (1 - item.score / 100)}
+                  initial={{ strokeDashoffset: 2 * Math.PI * 60 }}
+                  animate={{ strokeDashoffset: 2 * Math.PI * 60 * (1 - item.score / 100) }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                  strokeLinecap="round"
+                />
+                <defs>
+                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#9D6135" />
+                    <stop offset="100%" stopColor="#CDA580" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-3xl font-bold text-primary">{Math.round(item.score)}%</span>
               </div>
-            </motion.div>
-          );
-        })}
-      </div>
+            </div>
+
+            <div className={`text-xs font-bold uppercase tracking-widest py-1 px-3 rounded-full bg-light ${color}`}>
+              {label}
+            </div>
+          </motion.div>
+        );
+      })}
     </div>
   );
 }

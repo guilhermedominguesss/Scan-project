@@ -1,48 +1,47 @@
-# Scan de Crescimento Profissional
+# Scan de Crescimento Profissional - Premium UI Update
 
-Este projeto é uma Single Page Application (SPA) desenvolvida em React + TailwindCSS (Vite) para realizar um diagnóstico de crescimento profissional.
+Este projeto foi atualizado com uma interface Premium, responsividade aprimorada e fluxo de captura antecipada de leads.
+
+## Mudanças Principais
+
+1.  **Design Premium**: Nova paleta de cores (Primary: #9D6135, Background: #F8F7F2) e tipografia (Playfair Display + Inter).
+2.  **Captura Antecipada**: O usuário deve informar Nome, Empresa e WhatsApp *antes* de iniciar as perguntas do Quiz.
+3.  **Responsividade**: Mobile-first com ajustes finos para telas grandes.
+4.  **Social Proof**: Novos depoimentos com assets locais.
 
 ## Como Executar
 
-1.  Instale as dependências:
-    ```bash
-    npm install
-    ```
-2.  Inicie o servidor de desenvolvimento:
-    ```bash
-    npm run dev
-    ```
-3.  Acesse `http://localhost:5000` (ou a porta indicada).
+```bash
+npm install
+npm run dev
+```
 
-## Estrutura do Projeto
+## Estrutura de Pastas
 
-*   `/client/src/pages`: Contém as rotas principais (Home, Quiz, Radar, LP, Admin).
-*   `/client/src/components`: Componentes reutilizáveis (Header, QuestionCard, RadarBar, etc).
-*   `/client/src/contexts`: Gerenciamento de estado do Quiz.
-*   `/client/src/utils`: Lógica de cálculo de score, storage e analytics.
+*   `/client/src/components`: Componentes UI atualizados (QuestionCard, RadarBar, etc).
+*   `/client/src/pages`: Rotas com novos layouts.
+*   `/client/src/utils`: Lógica de negócios (Score, Analytics, Validators).
 
-## Funcionalidades
+## Paleta de Cores (Tailwind Tokens)
 
-*   **Quiz Interativo**: Perguntas passo a passo com barra de progresso.
-*   **Radar de Crescimento**: Visualização gráfica dos 3 pilares (Potencial, Captação, Eficiência).
-*   **Captura de Leads**: Salva nome/whatsapp antes de iniciar.
-*   **Admin Dashboard**: Painel protegido (senha: `guilherme2025`) para ver leads e exportar CSV.
-*   **Persistência**: Salva progresso no localStorage para evitar perda de dados.
+*   `primary`: #9D6135
+*   `dark`: #232326
+*   `accent`: #CDA580
+*   `light`: #F8F7F2
+*   `muted`: #6A635A
+
+## Admin Access
+
+Rota: `/admin`
+Senha: `guilherme2025`
 
 ## Checklist de QA
 
-- [x] Responsividade Mobile (testado em breakpoints sm/md)
-- [x] Cores e Fontes conforme Brand Guide
-- [x] Fluxo de Captura Antecipada funcionando
-- [x] Cálculo de Score correto
-- [x] Admin Page protegido por senha
-- [x] Exportação de CSV funcionando
-- [x] Tracking de eventos (Analytics)
-
-## Tecnologias
-
-- React 18
-- TailwindCSS v4
-- Framer Motion
-- Recharts
-- Wouter (Routing)
+- [x] Home Page com Hero responsivo
+- [x] Captura de Lead (Step 1) salvando draft
+- [x] Quiz Questions com novo card layout
+- [x] Confirmação final com edição de dados
+- [x] Radar Chart renderizando scores corretos
+- [x] LP com prova social e link WhatsApp correto
+- [x] Admin Dashboard funcional
+- [x] Analytics events disparando no console

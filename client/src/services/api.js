@@ -1,12 +1,12 @@
 // Mock API service
 import { getStorage, setStorage } from '../utils/storage';
 
-const DELAY = 800; // Simulated network delay
+const DELAY = 600; // Smoother simulated delay
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const api = {
-  // Save draft answers (debounce handled in component usually, but here we just mock save)
+  // Save draft answers
   saveDraft: async (data) => {
     await sleep(300);
     const current = getStorage('quiz_draft') || {};
@@ -25,6 +25,7 @@ export const api = {
   saveLead: async (lead) => {
     await sleep(DELAY);
     const leads = getStorage('leads') || [];
+    
     // Check if lead exists update it, else push
     const existingIndex = leads.findIndex(l => l.leadId === lead.leadId);
     

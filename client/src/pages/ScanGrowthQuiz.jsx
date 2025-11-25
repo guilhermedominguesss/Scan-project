@@ -1,18 +1,24 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import { useQuiz } from '../contexts/QuizContext';
 import { trackEvent, EVENTS } from '../utils/analytics';
 import { calculateScores } from '../utils/scoreCalculator';
+import { formatPhoneBR, validatePhoneBR } from '../utils/validators';
+import { api } from '../services/api';
 import Header from '../components/Header';
 import QuestionCard from '../components/QuestionCard';
 import ProgressBar from '../components/ProgressBar';
-import { api } from '../services/api';
+import CTAButton from '../components/CTAButton';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { motion, AnimatePresence } from 'framer-motion';
+import { LockKeyhole, CheckCircle2 } from 'lucide-react';
 
 const QUESTIONS = [
   {
     id: 'business_desc',
     type: 'text',
-    question: 'Para começar sua análise, me conte: qual é exatamente o seu negócio?',
+    question: 'Para começar, me conte: qual é exatamente o seu negócio?',
     placeholder: 'Ex.: Atuo com estética facial em São Paulo. Atendo sozinha e quero lotar agenda.',
     microcopy: 'Escreva de forma objetiva — isso nos ajuda a entender seu desafio real.',
     buttonText: 'Avançar'
@@ -81,29 +87,69 @@ export default function ScanGrowthQuiz() {
   const { 
     step, 
     nextStep, 
+    setStep,
     answers, 
     answerQuestion, 
     lead, 
-    setScores,
-    setStep
+    captureLead,
+    setScores
   } = useQuiz();
 
-  useEffect(() => {
-    // If no lead data, redirect to home to capture it first
-    if (!lead) {
-      setLocation('/');
-      return;
-    }
-    
-    trackEvent(EVENTS.QUIZ_STARTED, { leadId: lead.id });
+  const [captureForm, setCaptureForm] = useState({
+    name: '',
+    company: '',
+    whatsapp: ''
+  });
+  const [isCapturing, setIsCapturing] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
+  // Initialize state based on existing lead
+  useEffect(() => {
+    if (lead && lead.name) {
+      setCaptureForm({
+        name: lead.name,
+        company: lead.company,
+        whatsapp: lead.whatsapp
+      });
+      setIsCapturing(false);
+    }
+  }, [lead]);
+
+  // Before Unload Tracking
+  useEffect(() => {
     const handleUnload = () => {
-      trackEvent(EVENTS.QUIZ_ABANDONED, { lastStep: step, leadId: lead.id });
+      if (lead && !showConfirm) { // If confirm shown, it's almost done
+         trackEvent(EVENTS.QUIZ_ABANDONED, { lastStep: step, leadId: lead.id });
+      }
     };
     window.addEventListener('beforeunload', handleUnload);
     return () => window.removeEventListener('beforeunload', handleUnload);
-  }, [lead, step, setLocation]);
+  }, [lead, step, showConfirm]);
 
+
+  // CAPTURE STEP HANDLER
+  const handleCaptureSubmit = async (e) => {
+    e.preventDefault();
+    if (!captureForm.name || !captureForm.company || !captureForm.whatsapp) return;
+    
+    setIsSubmitting(true);
+    try {
+      await captureLead(captureForm);
+      setIsCapturing(false);
+      trackEvent(EVENTS.QUIZ_STARTED, { leadId: lead?.id }); // Will use new ID from context update
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePhoneChange = (e) => {
+    setCaptureForm(prev => ({ ...prev, whatsapp: formatPhoneBR(e.target.value) }));
+  };
+
+  // QUIZ HANDLER
   const handleAnswer = async (value) => {
     const currentQ = QUESTIONS[step];
     await answerQuestion(currentQ.id, value);
@@ -111,14 +157,22 @@ export default function ScanGrowthQuiz() {
     if (step < QUESTIONS.length - 1) {
       nextStep();
     } else {
-      // Finish Quiz
-      const finalScores = calculateScores({ ...answers, [currentQ.id]: value });
+      setShowConfirm(true);
+    }
+  };
+
+  // FINAL SUBMIT
+  const handleFinalSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      // Recalculate scores one last time to be safe
+      const finalScores = calculateScores(answers);
       setScores(finalScores);
       
-      // Save completed lead with scores
+      // Update lead with any edits from confirmation screen
       const completedLead = {
         ...lead,
-        answers: { ...answers, [currentQ.id]: value },
+        ...captureForm, // In case they edited it
         scores: finalScores,
         status: 'completed',
         completedAt: new Date().toISOString()
@@ -128,26 +182,181 @@ export default function ScanGrowthQuiz() {
       trackEvent(EVENTS.QUIZ_COMPLETED, { leadId: lead.id, scores: finalScores });
       
       setLocation('/radar');
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (!lead) return null;
+  // RENDER: CAPTURE SCREEN
+  if (isCapturing) {
+    return (
+      <div className="min-h-screen bg-[#F8F7F2] flex flex-col items-center justify-center p-4 relative overflow-hidden">
+        <Header className="absolute top-0 left-0" />
+        
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="w-full max-w-md bg-white rounded-card shadow-elegant border border-[#F1ECE5] p-8 md:p-10 z-10"
+        >
+          <div className="text-center mb-8 space-y-2">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary mb-4">
+              <LockKeyhole className="w-5 h-5" />
+            </div>
+            <h2 className="text-2xl font-serif font-bold text-dark">Antes de começar</h2>
+            <p className="text-sm text-muted">
+              Preencha seus dados para salvar sua análise caso precise parar no meio. Leva &lt; 60s.
+            </p>
+          </div>
 
+          <form onSubmit={handleCaptureSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="text-xs uppercase tracking-wider text-muted font-bold">Nome Completo</Label>
+              <Input 
+                id="name" 
+                value={captureForm.name} 
+                onChange={e => setCaptureForm(prev => ({...prev, name: e.target.value}))} 
+                required
+                className="bg-[#FAFAFA] border-input focus:border-primary h-12"
+                placeholder="Seu nome"
+              />
+            </div>
+            
+            <div className="space-y-1.5">
+              <Label htmlFor="company" className="text-xs uppercase tracking-wider text-muted font-bold">Nome da Empresa / Estúdio</Label>
+              <Input 
+                id="company" 
+                value={captureForm.company} 
+                onChange={e => setCaptureForm(prev => ({...prev, company: e.target.value}))} 
+                required
+                className="bg-[#FAFAFA] border-input focus:border-primary h-12"
+                placeholder="Ex: Clínica Silva"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="whatsapp" className="text-xs uppercase tracking-wider text-muted font-bold">WhatsApp</Label>
+              <Input 
+                id="whatsapp" 
+                value={captureForm.whatsapp} 
+                onChange={handlePhoneChange} 
+                required
+                className="bg-[#FAFAFA] border-input focus:border-primary h-12"
+                placeholder="(00) 00000-0000"
+              />
+            </div>
+
+            <CTAButton 
+              type="submit" 
+              loading={isSubmitting}
+              className="w-full mt-4"
+            >
+              Salvar e Iniciar
+            </CTAButton>
+            
+            <div className="flex items-center justify-center gap-2 text-[10px] text-muted/60 mt-4">
+              <LockKeyhole className="w-3 h-3" />
+              <span>Garantimos privacidade total dos seus dados.</span>
+            </div>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // RENDER: CONFIRMATION SCREEN
+  if (showConfirm) {
+    return (
+      <div className="min-h-screen bg-[#F8F7F2] flex flex-col items-center justify-center p-4">
+        <Header className="absolute top-0 left-0" />
+        
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md bg-white rounded-card shadow-elegant border border-[#F1ECE5] p-8 md:p-10"
+        >
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-serif font-bold text-dark mb-2">Quase lá!</h2>
+            <p className="text-sm text-muted">
+              Confirme seus dados para receber o relatório detalhado e o plano de ação.
+            </p>
+          </div>
+
+          <div className="space-y-4 mb-8">
+             <div className="space-y-1.5">
+              <Label className="text-xs uppercase tracking-wider text-muted font-bold">Nome</Label>
+              <Input 
+                value={captureForm.name} 
+                onChange={e => setCaptureForm(prev => ({...prev, name: e.target.value}))} 
+                className="bg-[#FAFAFA] h-11"
+              />
+            </div>
+             <div className="space-y-1.5">
+              <Label className="text-xs uppercase tracking-wider text-muted font-bold">Empresa</Label>
+              <Input 
+                value={captureForm.company} 
+                onChange={e => setCaptureForm(prev => ({...prev, company: e.target.value}))} 
+                className="bg-[#FAFAFA] h-11"
+              />
+            </div>
+             <div className="space-y-1.5">
+              <Label className="text-xs uppercase tracking-wider text-muted font-bold">WhatsApp</Label>
+              <Input 
+                value={captureForm.whatsapp} 
+                onChange={handlePhoneChange} 
+                className="bg-[#FAFAFA] h-11"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-xl border border-primary/10 mb-6">
+            <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+            <p className="text-xs text-dark leading-relaxed">
+              Autorizo o envio da minha análise completa e orientações de crescimento pelo WhatsApp.
+            </p>
+          </div>
+
+          <CTAButton 
+            onClick={handleFinalSubmit} 
+            loading={isSubmitting}
+            variant="accent"
+          >
+            Gerar meu Scan de Crescimento
+          </CTAButton>
+          
+          <button 
+            onClick={() => setShowConfirm(false)}
+            className="w-full text-center text-xs text-muted mt-4 hover:text-dark uppercase tracking-wider"
+          >
+            Voltar e revisar
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  // RENDER: QUIZ QUESTIONS
   const currentQ = QUESTIONS[step];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-[#F8F7F2] flex flex-col">
       <Header />
       
-      <main className="flex-1 flex flex-col items-center justify-center p-4 pb-20">
-        <ProgressBar current={step + 1} total={QUESTIONS.length} />
+      <main className="flex-1 flex flex-col items-center justify-center p-4 pb-20 relative">
+        {/* Progress Bar */}
+        <div className="w-full fixed top-[80px] left-0 z-40 bg-[#F8F7F2]/90 backdrop-blur-sm py-4">
+           <ProgressBar current={step + 1} total={QUESTIONS.length} />
+        </div>
         
-        <QuestionCard 
-          stepData={currentQ}
-          onAnswer={handleAnswer}
-          currentValue={answers[currentQ.id]}
-          isLoading={false}
-        />
+        <div className="mt-20 w-full">
+          <QuestionCard 
+            stepData={currentQ}
+            onAnswer={handleAnswer}
+            currentValue={answers[currentQ.id]}
+            isLoading={false}
+          />
+        </div>
       </main>
     </div>
   );

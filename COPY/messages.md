@@ -1,30 +1,25 @@
-# Copywriting e Mensagens do Sistema
+# Mensagens de WhatsApp Template
 
-## Mensagens de WhatsApp
+**LP Final (CTA Principal):**
+> "Bom dia! Completei o Scan de Crescimento. Meu nome é {name}, da empresa {company}. Gostaria de conversar sobre meus resultados e entender como melhorar meus pontos fracos."
 
-**Ao clicar no CTA final:**
-> "Olá! Completei o Scan de Crescimento. Meu nome é {name}. Empresa: {biz}. Quero conversar sobre meus resultados."
-
-**Admin para Lead:**
+**Admin para Lead (Contato Ativo):**
 > "Olá {name}, vi que você gerou seu Scan de Crescimento para a {company}. Podemos conversar sobre seus resultados?"
 
-## Microcopy do Quiz
+# Microcopy do Sistema
 
-**Tela Inicial:**
-> "Para salvar sua análise caso pare no meio, preencha seus dados. Leva < 10s."
-> "Garantimos privacidade — só usaremos para enviar sua análise."
+**Tela de Captura (Step 1):**
+> "Preencha seus dados para salvar sua análise caso precise parar no meio. Leva < 60s."
+> "Garantimos privacidade total dos seus dados."
 
-**Pergunta 1 (Negócio):**
-> "Escreva de forma objetiva — isso nos ajuda a entender seu desafio real."
+**Confirmação Final:**
+> "Confirme seus dados para receber o relatório detalhado e o plano de ação."
+> "Autorizo o envio da minha análise completa e orientações de crescimento pelo WhatsApp."
 
-**Radar de Crescimento:**
-> "Com base nas suas respostas, identificamos exatamente onde seu negócio está perdendo oportunidades."
+**Radar Page:**
+> "O Raio-X do seu Negócio"
+> "Com base nas suas respostas, mapeamos os 3 pilares fundamentais do seu crescimento."
 
-**LP Final:**
-> "Estamos prontos para te mostrar exatamente onde você perde clientes."
-
-## Definição dos Pilares (Radar)
-
-1.  **Potencial**: Mede o quanto sua estrutura atual comporta da sua ambição de faturamento.
-2.  **Captação**: Avalia a robustez dos seus canais de aquisição de clientes.
-3.  **Eficiência**: Analisa se você está "ocupado" ou "produtivo", focando no desafio comercial real.
+**LP Hero:**
+> "Seu negócio tem potencial de Escalar Agora."
+> "Analisamos seus dados e identificamos exatamente onde está o gargalo. Não é falta de esforço — é falta de estratégia direcionada."

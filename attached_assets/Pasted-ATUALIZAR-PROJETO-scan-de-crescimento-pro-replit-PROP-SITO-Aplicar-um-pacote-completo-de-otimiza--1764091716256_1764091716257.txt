@@ -1,0 +1,240 @@
+ATUALIZAR PROJETO: scan-de-crescimento-pro-replit
+PROPÓSITO: Aplicar um pacote completo de otimizações visuais, responsividade e UX premium ao projeto React + Tailwind já existente no Replit. NÃO recriar do zero — atualizar/refatorar o código atual conforme instruções e inserir melhorias.
+
+IMPORTANTE: trabalhar no mesmo repositório / pasta do projeto atual. Fazer commits separados por etapa (scaffold update → components → styles → pages → dashboard → QA).
+
+===========================
+1) RESUMO DO QUE ATUALIZAR
+===========================
+• Tornar o layout extremamente elegante e chamativo (igual ao quizz de estética que o cliente aprovou).
+• Tornar 100% responsivo (mobile-first) com breakpoints sm/md/lg/xl.
+• Captura antecipada: exigir Nome completo, Nome da empresa e WhatsApp antes das perguntas.
+• Trocar/atualizar provas sociais (3 segmentos: Estética, Moda, Serviços).
+• Implementar UI Rules Premium (tipografia, espaçamento, bordas, sombras).
+• Ajustar tailwind.config.js com tokens exatos de cor + novos utilitários (rounded-card, shadow-elegant).
+• Substituir cartões de pergunta pelo novo padrão premium.
+• Barra de progresso fina e animada (dourada).
+• Aplicar micro-animações (framer-motion) em entradas/saídas/pulses.
+• Garantir accessibility (labels, aria, focus styles).
+• Persistência, tracking e beforeunload já existentes — revisar e ajustar nomes de eventos conforme especificado.
+• Gerar /COPY com microcopy, mensagens de WhatsApp e README atualizado.
+• Usar imagens locais (paths abaixo) para prova social e mockups.
+
+ASSETS LOCAIS A UTILIZAR:
+- /mnt/data/Captura de tela 2025-11-25 103220.png
+- /mnt/data/Captura de tela 2025-11-25 103242.png
+- /mnt/data/Captura de tela 2025-11-25 103258.png
+- /mnt/data/Captura de tela 2025-11-25 103314.png
+
+===========================
+2) TAILWIND — CONFIGURAÇÃO (substituir/estender tailwind.config.js)
+===========================
+No arquivo tailwind.config.js, garantir:
+
+theme.extend = {
+  colors: {
+    primary: '#9D6135',
+    dark: '#232326',
+    accent: '#CDA580',
+    light: '#F8F7F2',
+    muted: '#6A635A'
+  },
+  borderRadius: {
+    'card': '22px',
+    'xl': '16px'
+  },
+  boxShadow: {
+    'soft': '0 8px 22px rgba(35,35,38,0.06)',
+    'elegant': '0 14px 34px rgba(35,35,38,0.08)'
+  },
+  spacing: {
+    section: '48px',
+    inner: '28px'
+  }
+}
+
+Adicionar plugins se necessário (forms, typography).
+
+===========================
+3) UI RULES PREMIUM — DIRETRIZES (inserir no README / STYLEGUIDE)
+===========================
+• Max-width do conteúdo: 640px (centralizado com mx-auto).  
+• Fundo principal: #F8F7F2; cartões brancos.  
+• Tipografia: Títulos — serif (ex.: Playfair/Georgia), weights 600–700; Corpo — Inter/Poppins.  
+• Cartões: bg-white, rounded-card, shadow-elegant, border subtle (#F1ECE5).  
+• Botões primários: height 48–56px, rounded-xl, bg-primary (#9D6135), hover darken 8%.  
+• ProgressBar: height 6px, bg #EAE5DF; fill gradient primary→accent.  
+• Espaços: vertical padding minimo 28px entre seções.  
+• Microcopy: color muted #6A635A, size sm.  
+• Interactions: transition 200–300ms; minimal framer-motion for enter/exit.
+
+===========================
+4) COMPONENTES A ATUALIZAR / CRIAR
+===========================
+Atualizar/criar com as classes e comportamento abaixo (arquivos: src/components):
+
+A) Header.jsx / Footer.jsx
+- Header: logo minimal à esquerda, pequeno link /admin à direita (opcional). Espaçamento generoso.
+- Footer: nota pequena, copyright.
+
+B) QuestionCard.jsx (SUBSTITUIR)
+Structure:
+<div class="bg-white rounded-card shadow-elegant border border-[#F1ECE5] p-inner space-y-4">
+  <h2 class="text-2xl font-serif text-dark leading-snug">{question}</h2>
+  <p class="text-sm text-muted">{description}</p>
+  {options/buttons}
+</div>
+
+• Option button: full width, py-4, rounded-xl, border subtle, hover: scale 1.01, focus outline ring-accent.
+
+C) ProgressBar.jsx
+- Thin, animated using framer-motion (or CSS transition) to new percentage.
+
+D) CTAButton.jsx
+- Variants: primary (bg-primary), secondary (outline dark), ghost.
+- Accessible: role=button, aria-label.
+
+E) RadarBar.jsx
+- Horizontal bar with animated fill, numeric percentage, label, small descriptive microcopy.
+
+F) LeadModal.jsx
+- For admin: view/edit lead; actions (resend, mark contact).
+
+G) ErrorBoundary.jsx
+- Fallback UI minimal elegant with retry button.
+
+===========================
+5) PAGES — UPDATES (src/pages)
+===========================
+A) Home.jsx
+- Simples hero: título elegante “Scan de Crescimento Profissional” e CTA grande “Iniciar o Scan”.
+- Small link “Retomar sessão” se localStorage.leadDraft exists.
+
+B) ScanGrowthQuiz.jsx
+Flow:
+1) FIRST STEP (CAPTURA ANTECIPADA) — modal/screen with three required inputs:
+   - Nome completo (input text) — required
+   - Nome da empresa / estúdio (input text) — required
+   - WhatsApp (input mask BR) — required
+   Microcopy: “Preencha para salvar sua análise. Leva < 60s.”
+   On save: persist draft in localStorage (key: leadDraft) and fire analytics.track('lead_captured_draft', {leadId,draft})
+   Proceed to question 1.
+
+2) Question 1 — Open text textarea (placeholder given) — description small.
+3) Questions 2–6 — replace cards with QuestionCard.
+4) Before final submit, show confirmation step re-displaying captured name/company/whatsapp with edit option.
+5) On submit: generate UUID leadId, construct lead object, save to localStorage.leads (push), call services.api.saveLead(lead) (mock), fire analytics.track('quiz_completed', {leadId}), route to /radar.
+
+• Ensure keyboard navigation and ARIA attributes.
+
+C) RadarPage.jsx
+- Read lead from context or localStorage.leads by leadId.
+- Compute scores with scoreCalculator.js (commented formulas).
+- Render three RadarBar components with animated fill.
+- CTA to /lp.
+
+D) LPPage.jsx
+- Hero (title/subtitle).
+- 3 dynamic columns (Demanda/Conversão/Recompra) showing labels (Alta/Média/Baixa) and microcopy.
+- Prova social area using local assets (paths acima) and updated testimonials:
+   • Estética — “Duplicamos o faturamento em 32 dias.” — Clínica Lumina
+   • Moda — “Vendas cresceram 68% em 45 dias.” — FitStyle Boutique
+   • Serviços — “Virei referência na região.” — Barber Pro Prime
+- Block black #232326 with CTA button (#CDA580) opening WhatsApp link prefilled:
+  "Olá! Completei o Scan de Crescimento. Meu nome é {name}. Empresa: {biz}. Quero conversar."
+
+E) AdminPage.jsx
+- Protect with modal prompt for password (guilherme2025).
+- Dashboard panels: total leads, leads by date range (7/30), funnel SVG (simple rectangles with percentages), abandonment by step (bar chart), table with pagination, filters.
+- Actions per lead (mark contact, resend, open whatsapp, export CSV).
+- Export CSV script: downloads current filtered leads.
+
+===========================
+6) SERVICES & UTILS
+===========================
+A) src/services/api.js (mock)
+- saveDraft(leadDraft) → write to localStorage.draft (debounced).
+- saveLead(lead) → push to localStorage.leads.
+
+B) src/utils/storage.js
+- getLeadDraft, setLeadDraft, clearDraft, getLeads, setLeads, exportCSV.
+
+C) src/utils/analytics.js
+- analytics.track(event, payload) → pushes to localStorage.events array with timestamp and console.log.
+
+D) src/utils/validators.js
+- phoneMask, validatePhoneBR, basic text sanitization.
+
+E) src/utils/scoreCalculator.js
+- Export functions to compute Potencial/Captação/Eficiência; add comments for how to tune.
+
+===========================
+7) TRACKING — EVENT NAMES (unificar)
+===========================
+Use exactly these event names:
+• quiz_started
+• lead_captured_draft
+• question_answered
+• quiz_abandoned
+• quiz_completed
+• radar_viewed
+• lp_viewed
+• whatsapp_clicked
+
+All events must include: { timestamp, leadId (if exists), step, payload } and be saved to localStorage.events.
+
+Add beforeunload listener to fire quiz_abandoned when draft exists and not completed.
+
+===========================
+8) PROVAS SOCIAIS — conteiner na LP (usar assets locais)
+===========================
+Replace existing LP proof section with three cards (Estética / Moda / Serviços). Use image thumbnails from assets (paths at top) as subtle background or mockup.
+
+Structure per card:
+- small thumbnail (object-cover, rounded-lg)
+- quote text (italic, muted)
+- author line (bold small)
+
+===========================
+9) RESPONSIVIDADE (REGRAS)
+===========================
+• Mobile-first classes; avoid fixed widths > 480px on mobile.
+• Text sizes responsive: text-base → sm:text-lg → md:text-xl.
+• Buttons full width on mobile, inline on desktop when necessary.
+• Images use object-fit cover and aspect-ratio utilities.
+
+===========================
+10) QA / PRECAUÇÕES REPLIT-FRIENDLY
+===========================
+• First step: create/update files skeleton (components + pages) — COMMIT.
+• Second step: implement components one-by-one — COMMIT per feature.
+• Run lint/format.
+• Avoid heavy runtime tasks; use local assets only.
+• If any long build step, print progress and partial success.
+• If an exception occurs, ErrorBoundary must capture and write stack to console + localStorage.errors with suggestion.
+
+===========================
+11) README / COPY / EXPORTS
+===========================
+• Update /README.md with quick run (npm i && npm run dev), QA checklist, and notes about tokens and how to adjust scores.
+• Create /COPY folder with:
+  - all screen titles and microcopy (ready to paste)
+  - WhatsApp message templates (prefilled)
+  - test data for QA
+
+===========================
+12) ENTREGA
+===========================
+Ao finalizar:
+1) Mostrar árvore de arquivos atualizada.
+2) Indicar quais arquivos foram modificados e por quê (breve changelog).
+3) Rodar npm run dev e informar URL local do preview (ou instruções).
+4) Incluir no console README: onde ajustar paleta, como mudar prova social e onde estão as fórmulas do radar.
+
+===========================
+CONFIRMAÇÃO
+===========================
+Antes de iniciar, responda no console:
+"CONFIRMAR: vou atualizar o projeto com UI Premium, responsividade e captura antecipada — deseja prosseguir?"
+
+Ao confirmar, execute as etapas descritas (scaffold update → components → pages → utils → services → QA).  
