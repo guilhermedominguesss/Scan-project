@@ -217,21 +217,21 @@ export default function ScanGrowthQuiz() {
   // STEP 0: CAPTURE SCREEN
   if (step === 0) {
     return (
-      <div className="min-h-screen bg-[#F8F7F2] flex flex-col items-center justify-center p-4 relative overflow-hidden">
-        <Header className="absolute top-0 left-0" />
+      <div className="min-h-screen bg-[#F8F7F2] flex flex-col items-center justify-center p-4 pt-24 md:pt-32 relative overflow-hidden">
+        <Header />
         
         <motion.div 
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md bg-white rounded-card shadow-elegant border border-[#F1ECE5] p-8 md:p-10 z-10"
+          className="w-full max-w-md bg-white rounded-card shadow-elegant border border-[#F1ECE5] p-6 md:p-10 z-10"
         >
-          <div className="text-center mb-8 space-y-2">
-            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary mb-4">
-              <LockKeyhole className="w-5 h-5" />
+          <div className="text-center mb-6 space-y-2">
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center mx-auto text-primary mb-3">
+              <LockKeyhole className="w-4 h-4" />
             </div>
-            <h2 className="text-2xl font-serif font-bold text-dark">Antes de começar</h2>
-            <p className="text-sm text-muted">
-              Para salvar sua análise caso pare no meio, preencha seu nome, empresa e WhatsApp. Leva &lt; 10s.
+            <h2 className="text-xl md:text-2xl font-serif font-bold text-dark">Antes de começar</h2>
+            <p className="text-xs md:text-sm text-muted leading-relaxed">
+              Preencha seus dados para salvar a análise. Leva &lt; 10s.
             </p>
           </div>
 
@@ -300,17 +300,17 @@ export default function ScanGrowthQuiz() {
   // STEP 7: CONFIRMATION SCREEN (After last question)
   if (step > QUESTIONS.length) {
     return (
-      <div className="min-h-screen bg-[#F8F7F2] flex flex-col items-center justify-center p-4">
-        <Header className="absolute top-0 left-0" />
+      <div className="min-h-screen bg-[#F8F7F2] flex flex-col items-center justify-center p-4 pt-24 md:pt-32">
+        <Header />
         
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md bg-white rounded-card shadow-elegant border border-[#F1ECE5] p-8 md:p-10"
+          className="w-full max-w-md bg-white rounded-card shadow-elegant border border-[#F1ECE5] p-6 md:p-10"
         >
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-serif font-bold text-dark mb-2">Quase lá!</h2>
-            <p className="text-sm text-muted">
+          <div className="text-center mb-6">
+            <h2 className="text-xl md:text-2xl font-serif font-bold text-dark mb-2">Quase lá!</h2>
+            <p className="text-xs md:text-sm text-muted leading-relaxed">
               Confirme seus dados para receber o relatório detalhado e o plano de ação.
             </p>
           </div>
@@ -346,9 +346,9 @@ export default function ScanGrowthQuiz() {
           </div>
 
           <div className="flex items-start gap-3 p-4 bg-primary/5 rounded-xl border border-primary/10 mb-6">
-            <CheckCircle2 className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-            <p className="text-xs text-dark leading-relaxed">
-              Autorizo o envio da minha análise completa e orientações de crescimento pelo WhatsApp.
+            <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+            <p className="text-[11px] md:text-xs text-dark leading-relaxed">
+              Autorizo o envio da minha análise completa e orientações pelo WhatsApp.
             </p>
           </div>
 
@@ -380,9 +380,9 @@ export default function ScanGrowthQuiz() {
     <div className="min-h-screen bg-[#F8F7F2] flex flex-col">
       <Header />
       
-      <main className="flex-1 flex flex-col items-center justify-center p-4 pb-20 relative">
+      <main className="flex-1 flex flex-col items-center justify-center px-4 py-8 pb-20 pt-28 md:pt-32 relative">
         {/* Progress Bar - Shows step 1/6, 2/6 etc. */}
-        <div className="w-full fixed top-[80px] left-0 z-40 bg-[#F8F7F2]/90 backdrop-blur-sm py-4">
+        <div className="w-full fixed top-16 md:top-20 left-0 z-40 bg-[#F8F7F2]/95 backdrop-blur-sm py-3 md:py-4 px-4">
            <ProgressBar current={step} total={QUESTIONS.length} />
         </div>
         
