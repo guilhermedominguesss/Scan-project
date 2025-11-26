@@ -1,65 +1,44 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { api } from '../services/api';
-import { getStorage, setStorage } from '../utils/storage';
-import { trackEvent, EVENTS } from '../utils/analytics';
 
-const QuizContext = createContext();
+const QuizContext = createContext(undefined);
 
-export const useQuiz = () => useContext(QuizContext);
+export const useQuiz = () => {
+  const context = useContext(QuizContext);
+  if (!context) {
+    throw new Error('useQuiz must be used within QuizProvider');
+  }
+  return context;
+};
 
 export const QuizProvider = ({ children }) => {
   const [lead, setLead] = useState(null);
   const [answers, setAnswers] = useState({});
   const [step, setStep] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [scores, setScores] = useState(null);
 
   // Load initial state
   useEffect(() => {
-    const loadState = async () => {
-      try {
-        const draft = await api.getDraft();
-        if (draft) {
-          if (draft.lead) setLead(draft.lead);
-          if (draft.answers) setAnswers(draft.answers);
-          if (draft.step !== undefined) setStep(draft.step);
-        }
-      } catch (e) {
-        console.error("Failed to load quiz state", e);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    loadState();
+    setIsLoading(false);
   }, []);
 
   // Save draft on change
-  const saveProgress = async (newLead, newAnswers, newStep) => {
-    const payload = {
-      lead: newLead !== undefined ? newLead : lead,
-      answers: newAnswers !== undefined ? newAnswers : answers,
-      step: newStep !== undefined ? newStep : step
-    };
-    
+  const saveProgress = (newLead, newAnswers, newStep) => {
     // Optimistic update
     if (newLead !== undefined) setLead(newLead);
     if (newAnswers !== undefined) setAnswers(newAnswers);
     if (newStep !== undefined) setStep(newStep);
-
-    await api.saveDraft(payload);
   };
 
-  const captureLead = async (leadData) => {
+  const captureLead = (leadData) => {
     const newLead = { ...leadData, id: crypto.randomUUID() };
-    await saveProgress(newLead, undefined, undefined);
-    trackEvent(EVENTS.LEAD_CAPTURED_DRAFT, { leadId: newLead.id });
+    saveProgress(newLead, undefined, undefined);
     return newLead;
   };
 
-  const answerQuestion = async (questionId, value) => {
+  const answerQuestion = (questionId, value) => {
     const newAnswers = { ...answers, [questionId]: value };
-    await saveProgress(undefined, newAnswers, undefined);
-    trackEvent(EVENTS.QUESTION_ANSWERED, { questionId, answer: value, leadId: lead?.id });
+    saveProgress(undefined, newAnswers, undefined);
   };
 
   const nextStep = () => {
