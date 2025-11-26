@@ -8,7 +8,13 @@ import { motion } from 'framer-motion';
 
 export default function Home() {
   const [_, setLocation] = useLocation();
-  const { lead } = useQuiz();
+  let lead = null;
+  try {
+    const quiz = useQuiz();
+    lead = quiz?.lead;
+  } catch (e) {
+    // Context not available yet
+  }
 
   const handleStart = () => {
     setLocation('/scan-growth');
